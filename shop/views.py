@@ -417,57 +417,48 @@ def redirect_to_error(request, code=500, title="Something Went Wrong", message="
     return redirect(f'/error.html?{query_string}')
 
 
+from django.shortcuts import render
+
+
 def handler404(request, exception):
     """Handle 404 - Page Not Found."""
-    from django.shortcuts import redirect
-    from urllib.parse import urlencode
-    
-    params = urlencode({
+    context = {
         'code': '404',
         'title': 'Page Not Found',
         'message': 'The page you are looking for does not exist or has been moved.',
-        'details': f'Path: {request.path}'
-    })
-    return redirect(f'/error.html?{params}')
+        'details': f'Path: {request.path}',
+    }
+    return render(request, 'error.html', context=context, status=404)
 
 
 def handler500(request):
     """Handle 500 - Internal Server Error."""
-    from django.shortcuts import redirect
-    from urllib.parse import urlencode
-    
-    params = urlencode({
+    context = {
         'code': '500',
         'title': 'Internal Server Error',
         'message': 'An unexpected error occurred on the server.',
-        'details': 'Please try again later or contact support.'
-    })
-    return redirect(f'/error.html?{params}')
+        'details': 'Please try again later or contact support.',
+    }
+    return render(request, 'error.html', context=context, status=500)
 
 
 def handler403(request, exception=None):
     """Handle 403 - Forbidden."""
-    from django.shortcuts import redirect
-    from urllib.parse import urlencode
-    
-    params = urlencode({
+    context = {
         'code': '403',
         'title': 'Access Forbidden',
         'message': 'You do not have permission to access this resource.',
-        'details': 'Contact administrator if you believe this is a mistake.'
-    })
-    return redirect(f'/error.html?{params}')
+        'details': 'Contact administrator if you believe this is a mistake.',
+    }
+    return render(request, 'error.html', context=context, status=403)
 
 
 def handler401(request, exception=None):
     """Handle 401 - Unauthorized."""
-    from django.shortcuts import redirect
-    from urllib.parse import urlencode
-    
-    params = urlencode({
+    context = {
         'code': '401',
         'title': 'Unauthorized',
         'message': 'Authentication is required to access this resource.',
-        'details': 'Please log in to continue.'
-    })
-    return redirect(f'/error.html?{params}')
+        'details': 'Please log in to continue.',
+    }
+    return render(request, 'error.html', context=context, status=401)
