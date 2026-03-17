@@ -29,7 +29,7 @@
         const p = await res.json();
         const box = document.getElementById("product");
         box.innerHTML = `
-          <img src="${p.image_url || "https://via.placeholder.com/400x200"}" alt="${p.name}" style="height:200px;object-fit:cover;">
+          <img src="${p.image_url || "./no-image.svg"}" alt="${p.name}" style="height:200px;object-fit:cover;" onerror="this.src='./no-image.svg'">
           <h2>${p.name}</h2>
           <p><strong>Price:</strong> $${p.price.toFixed(2)}</p>
           <p>${p.description || "No description"}</p>
