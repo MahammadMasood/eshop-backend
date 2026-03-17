@@ -43,9 +43,10 @@ else:
         "127.0.0.1",
         "localhost",
         "10.0.2.55",
-	"eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
-	"51.21.197.106"
-]
+        "eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
+        "51.21.197.106",
+        "51.20.138.251",
+    ]
 
 
 # Application definition
