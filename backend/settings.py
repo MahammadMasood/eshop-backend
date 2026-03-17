@@ -72,12 +72,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# Trusted origins that are allowed to make cross-origin requests with credentials.
+# When `CORS_ALLOW_ALL_ORIGINS` is True, the header is returned as '*' which
+# cannot be used together with `credentials: "include"` in the browser.
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-     "http://eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
-	"http://51.21.197.106:8000",
-	"http://51.21.197.106"
+    "http://eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
+    "http://51.21.197.106",
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+
+# Allow cookies/sessions to be sent with cross-site requests.
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'backend.urls'
 
