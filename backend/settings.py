@@ -25,7 +25,7 @@ PROJECT_ROOT = BASE_DIR.parent
 SECRET_KEY = 'django-insecure-s$!nj*dms4!1tu2&(o7ep)d5g)p3&bcmi^f#u$6279we^_e9i%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
+DEBUG = os.environ.get("DEBUG", "False").lower() == "False"
 
 # Error Handler Settings
 if not DEBUG:
@@ -34,15 +34,18 @@ if not DEBUG:
 else:
     # For development, errors will be displayed but also can be redirected
     pass
-
 allowed_hosts_env = os.environ.get("ALLOWED_HOSTS")
+
 if allowed_hosts_env:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(",") if host.strip()]
 else:
     ALLOWED_HOSTS = [
-        "127.0.0.1:8000",
-        "127.0.0.1"
-        ]
+        "127.0.0.1",
+        "localhost",
+        "10.0.2.55",
+	"eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
+	"51.21.197.106"
+]
 
 
 # Application definition
@@ -69,12 +72,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
-    "http://ecom-shop-bucket.s3-website.eu-north-1.amazonaws.com",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+     "http://eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
+	"http://51.21.197.106:8000",
+	"http://51.21.197.106"
 ]
+CORS_ALLOW_ALL_ORIGINS = True
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -101,12 +104,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 if os.environ.get("DB_NAME"):
     DATABASES = {
         'default': {
-            'ENGINE': os.environ.get("DB_ENGINE", 'django.db.backends.postgresql'),
+            'ENGINE': 'django.db.backends.mysql',
             'NAME': os.environ.get("DB_NAME"),
-            'USER': os.environ.get("DB_USER", ""),
-            'PASSWORD': os.environ.get("DB_PASSWORD", ""),
-            'HOST': os.environ.get("DB_HOST", "localhost"),
-            'PORT': os.environ.get("DB_PORT", "5432"),
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"),
+            'HOST': os.environ.get("DB_HOST"),
+            'PORT': os.environ.get("DB_PORT", "3306"),
         }
     }
 else:
@@ -116,7 +119,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

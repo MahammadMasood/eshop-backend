@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import date, timedelta
 
@@ -11,20 +10,8 @@ from .models import Product, Order, OrderItem, User, Admin
 
 
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "changemeadmin")
-
 def home(request):
-    """Tiny landing page so visiting http://127.0.0.1:8000/ doesn't 404."""
-    data = {
-        "service": "mini-shop-backend",
-        "routes": {
-            "api_base": "/api/",
-            "products": "/api/products/",
-            "django_admin": "/admin/",
-        },
-        "note": "Frontend is served separately from /frontend (e.g. python -m http.server 5500).",
-    }
-    return corsify(JsonResponse(data), request)
-
+    return JsonResponse({"status": "ok"})
 
 def corsify(response: HttpResponse, request=None) -> HttpResponse:
     """Attach permissive CORS headers so the static frontend can call the API."""
