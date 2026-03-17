@@ -42,7 +42,17 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Error handlers
+from django.views.static import serve
+
 handler404 = 'shop.views.handler404'
 handler500 = 'shop.views.handler500'
 handler403 = 'shop.views.handler403'
 handler401 = 'shop.views.handler401'
+
+# Serve frontend static assets directly from the frontend folder (useful when no separate static server is configured)
+FRONTEND_DIR = settings.PROJECT_ROOT / 'frontend'
+urlpatterns += [
+    path('styles.css', serve, {'path': 'styles.css', 'document_root': FRONTEND_DIR}),
+    path('logo.svg', serve, {'path': 'logo.svg', 'document_root': FRONTEND_DIR}),
+    path('no-image.svg', serve, {'path': 'no-image.svg', 'document_root': FRONTEND_DIR}),
+]
