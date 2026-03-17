@@ -148,8 +148,11 @@
     </div>
 
     <script>
-        const ADMIN_TOKEN = localStorage.getItem('admin_token');
-        const API_BASE = 'http://127.0.0.1:8000/api';
+        function getAdminToken() {
+            return localStorage.getItem('admin_token');
+        }
+        // Call the API on the same host/port that served this page.
+        const API_BASE = `${window.location.origin}/api`;
 
         function showLoginSection() {
             document.getElementById('login-section').classList.remove('hidden');
@@ -161,7 +164,7 @@
             document.getElementById('dashboard-section').classList.remove('hidden');
         }
 
-        if (ADMIN_TOKEN) {
+        if (getAdminToken()) {
             showDashboard();
         } else {
             showLoginSection();
@@ -217,7 +220,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Admin-Token': 'changemeadmin'
+                        'X-Admin-Token': getAdminToken() || ''
                     },
                     body: JSON.stringify({ name, price, description, stock })
                 });
@@ -235,7 +238,7 @@
                 const imageResponse = await fetch(`${API_BASE}/products/${product.id}/upload-image/`, {
                     method: 'POST',
                     headers: {
-                        'X-Admin-Token': 'changemeadmin'
+                        'X-Admin-Token': getAdminToken() || ''
                     },
                     body: formData
                 });

@@ -35,8 +35,24 @@ def parse_json(request):
 
 
 def ensure_admin(request):
-    token = request.headers.get("X-Admin-Token")
-    return token == ADMIN_TOKEN
+    token = (request.headers.get("X-Admin-Token") or "").strip()
+    if not token:
+        return False
+
+    # Allow a shared deployment token for simple admin tooling.
+    if token == ADMIN_TOKEN:
+        return True
+
+    # Also allow the token returned by `/api/admin/login/` which is stored as `admin_<id>`.
+    # This makes the browser admin UI work without sharing a global secret.
+    if token.startswith("admin_"):
+        try:
+            admin_id = int(token.removeprefix("admin_"))
+        except ValueError:
+            return False
+        return Admin.objects.filter(id=admin_id).exists()
+
+    return False
 
 
 def handle_options(request):

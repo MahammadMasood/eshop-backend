@@ -142,7 +142,8 @@
 
     <script>
         const ADMIN_TOKEN = localStorage.getItem('admin_token');
-        const API_BASE = 'http://127.0.0.1:8000/api';
+        // Call the API on the same host/port that served this page.
+        const API_BASE = `${window.location.origin}/api`;
 
         function showLoginSection() {
             document.getElementById('login-section').classList.remove('hidden');
