@@ -60,8 +60,18 @@ def handle_options(request):
     return corsify(resp, request)
 
 
-def serialize_product(product: Product):
-    uploaded_image_url = product.image.url if product.image else None
+def serialize_product(product: Product, request=None):
+    # When possible, return a full absolute URL for uploaded images to avoid
+    # frontend path issues regardless of how the frontend is served.
+    uploaded_image_url = None
+    if product.image:
+        if request is not None:
+            uploaded_image_url = request.build_absolute_uri(product.image.url)
+        else:
+            uploaded_image_url = product.image.url
+    # Ensure uploaded image URLs are absolute paths so they work reliably in the frontend.
+    if uploaded_image_url and not uploaded_image_url.startswith("/") and not uploaded_image_url.startswith("http"):
+        uploaded_image_url = f"/{uploaded_image_url}"
     effective_image_url = uploaded_image_url or product.image_url
     return {
         "id": product.id,
@@ -101,7 +111,7 @@ def products(request):
         return handle_options(request)
 
     if request.method == "GET":
-        data = [serialize_product(p) for p in Product.objects.all().order_by("id")]
+        data = [serialize_product(p, request) for p in Product.objects.all().order_by("id")]
         return corsify(JsonResponse(data, safe=False), request)
 
     if request.method == "POST":
@@ -131,7 +141,7 @@ def product_detail(request, product_id: int):
         return corsify(JsonResponse({"detail": "Product not found."}, status=404), request)
 
     if request.method == "GET":
-        return corsify(JsonResponse(serialize_product(product)), request)
+        return corsify(JsonResponse(serialize_product(product, request)), request)
 
     if request.method in ("PUT", "PATCH"):
         if not ensure_admin(request):
