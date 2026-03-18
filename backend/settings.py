@@ -25,7 +25,8 @@ PROJECT_ROOT = BASE_DIR.parent
 SECRET_KEY = 'django-insecure-s$!nj*dms4!1tu2&(o7ep)d5g)p3&bcmi^f#u$6279we^_e9i%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False").lower() == "False"
+# Default to True for local development; set DEBUG=False in production.
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes")
 
 # Error Handler Settings
 if not DEBUG:
