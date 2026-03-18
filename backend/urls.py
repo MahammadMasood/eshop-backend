@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from django.views.static import serve
 from shop import views as shop_views
 from shop.views import home
 
@@ -39,11 +40,23 @@ urlpatterns = [
     path('health/', shop_views.home),
     path('admin/', admin.site.urls),
     path('api/', include('shop.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Automatically serve static + media files when running without a separate static file server.
+# - In development, Django's `static()` helper works reliably.
+# - In simple deployments where the webserver does not handle /media/, we also serve it here.
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # NOTE: Serving media/static via Django in production is not recommended for high traffic.
+    # This is a convenient fallback for simple deployments.
+    urlpatterns += [
+        path(f"{settings.MEDIA_URL.lstrip('/')}<path:path>", serve, {'document_root': settings.MEDIA_ROOT}),
+        path(f"{settings.STATIC_URL.lstrip('/')}<path:path>", serve, {'document_root': settings.STATIC_ROOT}),
+    ]
 
 # Error handlers
-from django.views.static import serve
-
 handler404 = 'shop.views.handler404'
 handler500 = 'shop.views.handler500'
 handler403 = 'shop.views.handler403'
