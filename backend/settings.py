@@ -41,12 +41,8 @@ if allowed_hosts_env:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(",") if host.strip()]
 else:
     ALLOWED_HOSTS = [
-        "127.0.0.1",
-        "localhost",
-        "10.0.2.55",
-        "eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
-        "51.21.197.106",
-        "51.20.138.251",
+        "10.0.1.55",
+	"3.235.184.166"
     ]
 
 
@@ -63,6 +59,7 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -78,8 +75,7 @@ MIDDLEWARE = [
 # cannot be used together with `credentials: "include"` in the browser.
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "http://eshop-alb-245581475.eu-north-1.elb.amazonaws.com",
-    "http://51.21.197.106",
+    "http://3.235.184.166",
 ]
 
 # Allow cookies/sessions to be sent with cross-site requests.
@@ -101,6 +97,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -173,3 +170,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
