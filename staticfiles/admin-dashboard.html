@@ -143,7 +143,7 @@
     <script>
         const ADMIN_TOKEN = localStorage.getItem('admin_token');
         // Call the API on the same host/port that served this page.
-        const API_BASE = `${window.location.origin}/api`;
+        const API_BASE = `${window.location.origin}`;
 
         function showLoginSection() {
             document.getElementById('login-section').classList.remove('hidden');
@@ -168,7 +168,7 @@
             const messageEl = document.getElementById('login-message');
 
             try {
-                const response = await fetch(`${API_BASE}/admin-login/`, {
+                const response = await fetch(`${API_BASE}/api/admin/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
