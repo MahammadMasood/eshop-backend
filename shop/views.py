@@ -212,6 +212,7 @@ def product_upload_image(request, product_id: int):
         return corsify(JsonResponse({"detail": "No file found. Send multipart field 'image'."}, status=400), request)
 
     product.image = uploaded
+    product.image_url = request.build_absolute_uri(product.image.url)
     product.save()
     return corsify(JsonResponse(serialize_product(product, request)), request)
 
