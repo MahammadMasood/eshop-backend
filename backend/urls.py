@@ -39,6 +39,7 @@ urlpatterns = [
 
     # Backend
     path('health/', shop_views.home),
+    path('api/health/', shop_views.home),
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),
     path('api/', include('shop.urls')),

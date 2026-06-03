@@ -43,7 +43,7 @@ def ensure_admin(request):
     if token == ADMIN_TOKEN:
         return True
 
-    # Also allow the token returned by `/api/admin/login/` which is stored as `admin_<id>`.
+    # Also allow the token returned by `/admin/login/` which is stored as `admin_<id>`.
     # This makes the browser admin UI work without sharing a global secret.
     if token.startswith("admin_"):
         try:
