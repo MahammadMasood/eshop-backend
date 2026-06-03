@@ -60,19 +60,24 @@ def handle_options(request):
     return corsify(resp, request)
 
 
+def normalize_image_url(url, request=None):
+    if not url:
+        return None
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    if url.startswith("/"):
+        return request.build_absolute_uri(url) if request is not None else url
+    return request.build_absolute_uri(f"/{url}") if request is not None else f"/{url}"
+
+
 def serialize_product(product: Product, request=None):
-    # When possible, return a full absolute URL for uploaded images to avoid
-    # frontend path issues regardless of how the frontend is served.
+    # Always return a usable image URL for the frontend, even when the page is
+    # served from a different host than the backend itself.
     uploaded_image_url = None
     if product.image:
-        if request is not None:
-            uploaded_image_url = request.build_absolute_uri(product.image.url)
-        else:
-            uploaded_image_url = product.image.url
-    # Ensure uploaded image URLs are absolute paths so they work reliably in the frontend.
-    if uploaded_image_url and not uploaded_image_url.startswith("/") and not uploaded_image_url.startswith("http"):
-        uploaded_image_url = f"/{uploaded_image_url}"
-    effective_image_url = uploaded_image_url or product.image_url
+        uploaded_image_url = normalize_image_url(product.image.url, request)
+
+    effective_image_url = uploaded_image_url or normalize_image_url(product.image_url, request)
     return {
         "id": product.id,
         "name": product.name,
@@ -125,7 +130,7 @@ def products(request):
             image_url=payload.get("image_url", ""),
             stock=payload.get("stock", 0),
         )
-        return corsify(JsonResponse(serialize_product(product), status=201), request)
+        return corsify(JsonResponse(serialize_product(product, request), status=201), request)
 
     return corsify(JsonResponse({"detail": "Method not allowed."}, status=405), request)
 
@@ -151,7 +156,7 @@ def product_detail(request, product_id: int):
             if field in payload:
                 setattr(product, field, payload[field])
         product.save()
-        return corsify(JsonResponse(serialize_product(product)), request)
+        return corsify(JsonResponse(serialize_product(product, request)), request)
 
     if request.method == "DELETE":
         if not ensure_admin(request):
@@ -185,7 +190,7 @@ def product_upload_image(request, product_id: int):
 
     product.image = uploaded
     product.save()
-    return corsify(JsonResponse(serialize_product(product)), request)
+    return corsify(JsonResponse(serialize_product(product, request)), request)
 
 
 @csrf_exempt
