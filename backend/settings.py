@@ -46,7 +46,6 @@ else:
     "127.0.0.1",
     ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -78,6 +77,12 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://3.236.211.238",
     "https://3.236.211.238",
+    "http://3.235.184.166",
+    "http://3.236.211.238",
+    "http://51.21.197.106",
+    "http://10.0.1.55:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
 
 # Allow cookies/sessions to be sent with cross-site requests.
