@@ -22,6 +22,7 @@ from django.views.generic import TemplateView
 from django.views.static import serve
 from shop import views as shop_views
 from shop.views import home
+from django.urls import path, include
 
 urlpatterns = [
     # Frontend pages (served by Django so frontend+backend run on one server/port)
@@ -39,6 +40,7 @@ urlpatterns = [
     # Backend
     path('health/', shop_views.home),
     path('admin/', admin.site.urls),
+    path('', include('shop.urls')),
     path('api/', include('shop.urls')),
 ]
 
