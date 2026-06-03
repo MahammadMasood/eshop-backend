@@ -11,7 +11,9 @@ django.setup()
 from shop.models import User, Admin, Product
 
 # Create a test user
-user, created = User.objects.get_or_create(username='Mapath('api/', include('shop.urls')),path('api/', include('shop.urls')),path('api/', include('shop.urls')),sood')
+user, created = User.objects.get_or_create(
+    username='Masood'
+)
 if created:
     user.set_password('password123')
     user.email = 'testuser@example.com'
