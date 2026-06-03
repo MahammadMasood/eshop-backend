@@ -205,6 +205,7 @@ def cart(request):
             except Product.DoesNotExist:
                 continue
             subtotal = float(product.price) * qty
+            image_url = serialize_product(product, request).get("image_url")
             items.append(
                 {
                     "product_id": product.id,
@@ -212,7 +213,7 @@ def cart(request):
                     "price": float(product.price),
                     "quantity": qty,
                     "subtotal": subtotal,
-                    "image_url": product.image_url,
+                    "image_url": image_url,
                 }
             )
             total += subtotal
