@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 """
-Setup test data for the e-commerce application
+Setup test data for the e-commerce application.
+Use --reset to delete all existing products before recreating sample data.
 """
 import os
+import sys
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -32,7 +34,11 @@ if created:
 else:
     print("✓ Test admin already exists: testadmin / admin123")
 
-# Create sample products if none exist
+reset_requested = "--reset" in sys.argv
+if reset_requested:
+    deleted_count, _ = Product.objects.all().delete()
+    print(f"✓ Deleted {deleted_count} existing products")
+
 if Product.objects.count() == 0:
     products = [
         Product(name='Laptop', price=999.99, description='High-performance laptop', stock=5),
