@@ -71,16 +71,29 @@ def normalize_image_url(url, request=None):
 
 
 def serialize_product(product: Product, request=None):
-    # Prefer real uploaded files, but fall back to a safe placeholder when the
-    # stored image file is missing on disk (which happens with old uploads).
-    uploaded_image_url = None
+    # Prefer real uploaded files, but never return a broken /media/products URL
+    # when the stored file is missing on disk (which is what causes the 404s).
     has_uploaded_file = bool(product.image and product.image.name and product.image.storage.exists(product.image.name))
+    if product.image and not has_uploaded_file:
+        placeholder_url = normalize_image_url("/no-image.svg", request)
+        return {
+            "id": product.id,
+            "name": product.name,
+            "price": float(product.price),
+            "description": product.description,
+            "image_url": placeholder_url,
+            "uploaded_image_url": None,
+            "stock": product.stock,
+        }
+
+    uploaded_image_url = None
     if has_uploaded_file:
         uploaded_image_url = normalize_image_url(product.image.url, request)
 
     fallback_url = None
     if product.image_url:
         if product.image_url.startswith("http://") or product.image_url.startswith("https://"):
+            # Keep external image URLs, but avoid local media URLs if the file is missing.
             fallback_url = normalize_image_url(product.image_url, request)
         elif product.image_url.startswith("/media/"):
             fallback_url = normalize_image_url("/no-image.svg", request)
