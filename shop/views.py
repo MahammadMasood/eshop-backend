@@ -71,13 +71,23 @@ def normalize_image_url(url, request=None):
 
 
 def serialize_product(product: Product, request=None):
-    # Always return a usable image URL for the frontend, even when the page is
-    # served from a different host than the backend itself.
+    # Prefer real uploaded files, but fall back to a safe placeholder when the
+    # stored image file is missing on disk (which happens with old uploads).
     uploaded_image_url = None
-    if product.image:
+    has_uploaded_file = bool(product.image and product.image.name and product.image.storage.exists(product.image.name))
+    if has_uploaded_file:
         uploaded_image_url = normalize_image_url(product.image.url, request)
 
-    effective_image_url = uploaded_image_url or normalize_image_url(product.image_url, request)
+    fallback_url = None
+    if product.image_url:
+        if product.image_url.startswith("http://") or product.image_url.startswith("https://"):
+            fallback_url = normalize_image_url(product.image_url, request)
+        elif product.image_url.startswith("/media/"):
+            fallback_url = normalize_image_url("/no-image.svg", request)
+        else:
+            fallback_url = normalize_image_url(product.image_url, request)
+
+    effective_image_url = uploaded_image_url or fallback_url or normalize_image_url("/no-image.svg", request)
     return {
         "id": product.id,
         "name": product.name,
