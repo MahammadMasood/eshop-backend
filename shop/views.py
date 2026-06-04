@@ -1,10 +1,12 @@
 import os
 import json
+import mimetypes
 from datetime import date, timedelta
 
 from django.db import models
 from django.db.models.functions import TruncDate
-from django.http import JsonResponse, HttpResponse
+from django.conf import settings
+from django.http import FileResponse, Http404, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Product, Order, OrderItem, User, Admin
@@ -88,7 +90,8 @@ def serialize_product(product: Product, request=None):
 
     uploaded_image_url = None
     if has_uploaded_file:
-        uploaded_image_url = normalize_image_url(product.image.url, request)
+        # Serve via /api/ so images work when the reverse proxy only forwards API routes.
+        uploaded_image_url = normalize_image_url(f"/api/products/{product.id}/image/", request)
 
     fallback_url = None
     if product.image_url:
@@ -190,6 +193,26 @@ def product_detail(request, product_id: int):
     return corsify(JsonResponse({"detail": "Method not allowed."}, status=405), request)
 
 
+def product_image(request, product_id: int):
+    """Serve the uploaded product image file (works even when /media/ is not proxied)."""
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        raise Http404("Product not found.")
+
+    if product.image and product.image.name and product.image.storage.exists(product.image.name):
+        content_type, _ = mimetypes.guess_type(product.image.name)
+        response = FileResponse(product.image.open("rb"), content_type=content_type or "application/octet-stream")
+        response["Cache-Control"] = "public, max-age=3600"
+        return response
+
+    placeholder = settings.PROJECT_ROOT / "frontend" / "no-image.svg"
+    if placeholder.exists():
+        return FileResponse(placeholder.open("rb"), content_type="image/svg+xml")
+
+    raise Http404("Image not found.")
+
+
 @csrf_exempt
 def product_upload_image(request, product_id: int):
     """Admin-only endpoint to upload a product image using multipart form-data."""
@@ -212,7 +235,7 @@ def product_upload_image(request, product_id: int):
         return corsify(JsonResponse({"detail": "No file found. Send multipart field 'image'."}, status=400), request)
 
     product.image = uploaded
-    product.image_url = request.build_absolute_uri(product.image.url)
+    product.image_url = request.build_absolute_uri(f"/api/products/{product.id}/image/")
     product.save()
     return corsify(JsonResponse(serialize_product(product, request)), request)
 
