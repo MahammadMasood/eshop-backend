@@ -164,11 +164,34 @@
             document.getElementById('dashboard-section').classList.remove('hidden');
         }
 
-        if (getAdminToken()) {
-            showDashboard();
-        } else {
+        async function updateView() {
             showLoginSection();
+            const token = getAdminToken();
+            if (!token) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/session/`, {
+                    headers: { 'X-Admin-Token': token },
+                });
+                if (response.ok) {
+                    showDashboard();
+                } else {
+                    localStorage.removeItem('admin_token');
+                }
+            } catch {
+                localStorage.removeItem('admin_token');
+            }
         }
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                updateView();
+            }
+        });
+
+        updateView();
 
         async function readJsonOrText(res) {
             const contentType = (res.headers.get("content-type") || "").toLowerCase();

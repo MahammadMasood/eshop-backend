@@ -454,6 +454,21 @@ def user_login(request):
 
 
 @csrf_exempt
+def admin_session(request):
+    """Verify the X-Admin-Token header belongs to a real admin session."""
+    if request.method == "OPTIONS":
+        return handle_options(request)
+
+    if request.method != "GET":
+        return corsify(JsonResponse({"detail": "Method not allowed."}, status=405), request)
+
+    if ensure_admin(request):
+        return corsify(JsonResponse({"authenticated": True}), request)
+
+    return corsify(JsonResponse({"authenticated": False, "detail": "Invalid or missing admin token."}, status=401), request)
+
+
+@csrf_exempt
 def admin_login(request):
     """Handle admin login."""
     if request.method == "OPTIONS":
